@@ -57,3 +57,11 @@ def get_params_as_df(run: Run,
     if drop:
         for key in drop: params.pop(key, None)
     return pd.DataFrame(params.items(), columns=['Parameter','Value'])
+
+def get_metrics_as_df(run: Run,
+                     drop: Optional[List[str]] = None
+                     ) -> pd.DataFrame:
+    metrics = run.data.metrics
+    if drop:
+        for key in drop: metrics.pop(key, None)
+    return pd.DataFrame(metrics.items(), columns=['Metric','Value'])
