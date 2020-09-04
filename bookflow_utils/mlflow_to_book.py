@@ -17,7 +17,7 @@ class BookflowConfig():
     config_template = dict(
         tracking_uri='/path/to/mlruns',
         experiment_name='experiment_name',
-        default_valid_run_tag={'main_tag': 'True'}
+        target_tag={'main_tag': 'True'}
     )
 
     def __init__(self, config_file=None, tracking_uri=None, experiment_name=None, target_tag=None):

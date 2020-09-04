@@ -10,6 +10,10 @@ setup(
    author='Jeroen Franse',
    author_email='contact@jeroenfranse.com',
    packages=['bookflow_utils'],  #same as name
-   install_requires=['mlflow', 'jupyter-book'], #external packages as dependencies
+   install_requires=['mlflow', 'jupyter-book', 'click'], #external packages as dependencies
    include_package_data=True,
+   entry_points='''
+        [console_scripts]
+        bookflow=bookflow_utils.cli:cli
+   '''
 )
