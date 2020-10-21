@@ -2,6 +2,7 @@ import click
 from pathlib import Path
 from shutil import copyfile
 import yaml
+import jinja2, jupytext, myst_parser
 from bookflow_utils.mlflow_to_book import BookflowConfig
 
 @click.group()
@@ -20,8 +21,22 @@ def myst(filepath):
     target_name = Path(filepath).stem
     if '.md' not in target_name: target_name = target_name+'.md'
     click.echo(f"Creating new MyST markdown file {target_name} in location: {target_path}")
-    preamble_file = Path(__file__).parent/Path('resources/myst_ipython3_preamble.txt')
-    copyfile(preamble_file, target_path/target_name)
+
+    preamble_location = Path(__file__).parent/Path('resources/')
+    preamble_name = 'myst_ipython3_preamble.j2'
+
+    preamble_data = dict(
+        jupytext_version = jupytext.__version__,
+        myst_parser_version = '.'.join(myst_parser.__version__.split('.')[0:2]),
+    )
+
+    templateLoader = jinja2.FileSystemLoader(searchpath=preamble_location)
+    templateEnv = jinja2.Environment(loader=templateLoader, autoescape=True)
+    template = templateEnv.get_template(preamble_name)
+    output_preamble = template.render(preamble_data)
+
+    with open(target_path/target_name, 'w') as f:
+        f.write(output_preamble)
 
 @create.command()
 def labjournal():
