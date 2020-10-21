@@ -1,20 +1,20 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from typing import List, Optional
+from typing import List, Optional, NoReturn, Union
 
 import mlflow
 from mlflow.entities import ViewType
 from mlflow.entities.run import Run
 
-def set_note(note):
+def set_note(note: str) -> NoReturn:
     mlflow.set_tag('mlflow.note.content', note)
 
-def set_tags(tags):
+def set_tags(tags: dict) -> NoReturn:
     for key, value in tags.items():
             mlflow.set_tag(key, value)
 
-def log_fig(filename, fig=None):
+def log_fig(filename: str, fig=None) -> NoReturn:
     if not fig:
         fig = plt.gcf()
     fig.savefig(filename)
@@ -23,10 +23,13 @@ def log_fig(filename, fig=None):
 
 
 
-def get_experiment_id(experiment_name):
+def get_experiment_id(experiment_name: str) -> str:
     return mlflow.get_experiment_by_name(experiment_name).experiment_id
 
-def get_latest_run(experiment_id, tags=None, status="FINISHED", custom_query=None):
+def get_latest_run(experiment_id: Union[str, int],
+                   tags: dict = None,
+                   status: str = "FINISHED",
+                   custom_query: str = None):
     """Get the latest MLFLow run that matched the parameters.
 
     Params:
@@ -52,7 +55,6 @@ def get_latest_run(experiment_id, tags=None, status="FINISHED", custom_query=Non
 def get_params_as_df(run: Run,
                      drop: Optional[List[str]] = None
                      ) -> pd.DataFrame:
-    #params = {k:v for k, v in run.data.params.items() if k not in drop}
     params = run.data.params
     if drop:
         for key in drop: params.pop(key, None)

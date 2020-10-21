@@ -20,12 +20,16 @@ class BookflowConfig():
         target_tag={'main_tag': 'True'}
     )
 
-    def __init__(self, config_file=None, tracking_uri=None, experiment_name=None, target_tag=None):
+    def __init__(self,
+                 config_file: str = None,
+                 tracking_uri: str = None,
+                 experiment_name: str = None,
+                 target_tag: dict = None):
         """Set the configuration. Config from config file will take precedence over keyword arguments.
 
         Args:
             config_file: path to config file
-            tracking_uri: path to where your MLFlor runs are stored
+            tracking_uri: path to where your MLFlow runs are stored
             experiment_name: the MLFlow experiment name you want to load from
             target_tag: dictionary of {'tagname':'value'} that will be passed to the mlflow search to select runs.
         """
@@ -51,24 +55,25 @@ class BookflowHelper():
         self.target_tag = config.target_tag
 
         self.set_tracking_uri()
-        self.experiment_id = self.get_experiment_id()
+        _ = self.get_and_set_experiment_id()
 
         self.latest_run = self.get_latest_run()
 
-    def get_experiment_id(self, experiment_name=None):
-        """Retrun MLFlow experiment id. Defaults to the configured experiment name, but you can supply a different one."""
-        return get_experiment_id(experiment_name if experiment_name else self.experiment_name)
+    def get_and_set_experiment_id(self, experiment_name: str = None) -> str:
+        """Retrun and set MLFlow experiment id. Defaults to the configured experiment name, but you can supply a different one."""
+        self.experiment_id = get_experiment_id(experiment_name if experiment_name else self.experiment_name)
+        return self.experiment_id
 
-    def get_latest_run(self, tags='default', custom_query=None) -> mlflow.entities.run.Run:
+    def get_latest_run(self, tags: Union[dict, str] = 'default', custom_query: str = None) -> mlflow.entities.run.Run:
         """Return the latest MLFlow Run from the configured experiment.
-        By default only selects from runs with the configured target tag, but this behaviour can be superseded..
+        By default only selects from runs with the configured target tag, but this behaviour can be superseded.
 
         Args:
-            tags: by default only runs with the configured tag:value are selected. Replace with your own {'tag':'value'} or None
+            tags: by default only Runs with the configured tag:value are selected. Replace with your own {'tag':'value'} or None
             custom_query: supply a custom query string to be appended to the search if you want.
 
         Returns:
-            MLFlor Run object for the most recent run.
+            MLFlow Run object for the most recent run.
         """
         if tags == 'default': tags = self.target_tag
         return get_latest_run(self.experiment_id, tags=tags, custom_query=custom_query)
